@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "stack.h"
 
 #define MAXLENGTH 16
 

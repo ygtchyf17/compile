@@ -6,11 +6,15 @@
 #define MAXLENGTH 16
 
 #include <stdio.h>
+#include "stack.h"
+
 extern int yylineno;
 extern char *yytext;
 
 /*global=0, local=1, procedure=2*/
-enum Type { GLOB, LOC, PLOC};
+/*
+enum Type { GLOB, LOC, PROC};
+*/
 enum Type flag = GLOB;
 %}
 
@@ -46,7 +50,7 @@ outblock
 
 var_decl_part
         : /* empty */
-        | var_decl_list SEMICOLON
+        | var_decl_list SEMICOLON {flag = LOC;} /*局所変数*/
         ;
 
 var_decl_list
@@ -74,11 +78,10 @@ subprog_decl
 
 proc_decl
          : PROCEDURE proc_name SEMICOLON inblock
-        {flag = LOC;} /*局所変数*/
-        ;
+         ;
 
 proc_name
-         : IDENT
+         : IDENT {insert($1,PROC);}
         ;
 
 inblock
@@ -187,8 +190,8 @@ arg_list
         ;
 
 id_list
-         : IDENT
-         | id_list COMMA IDENT
+         : IDENT {insert($1,flag);}
+         | id_list COMMA IDENT {insert($3,flag);}
         ;
 %%
 yyerror(char *s)

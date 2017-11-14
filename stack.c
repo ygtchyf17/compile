@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "stack.h"
 
+struct Stack *list_ptr = NULL;
+
+/*
 struct Stack
 {
   char var[256];       //変数
@@ -11,7 +15,7 @@ struct Stack
 };
 
 enum Type { GLOB, LOC, PLOC };
-
+*/
 void printTable(struct Stack *rec)
 {
     int mode = rec->type;
@@ -19,25 +23,25 @@ void printTable(struct Stack *rec)
     if( rec != NULL ){
       switch(mode){
         case GLOB:
-        printf("%s\t%d\tglob",rec->var,rec->address);
+        printf("%s\t%d\tglob\n",rec->var,rec->address);
         break;
 
         case LOC:
-        printf("%s\t%d\tloc",rec->var,rec->address);
+        printf("%s\t%d\tloc\n",rec->var,rec->address);
         break;
 
-        case PLOC:
-        printf("%s\t%d\tploc",rec->var,rec->address);
+        case PROC:
+        printf("%s\t%d\tproc\n",rec->var,rec->address);
         break;
       }
     }
 }
 
-void printAll( struct Stack *list ){
+void printAll(){
 
-  struct AccountRecord *rec;
+  struct Stack *rec;
 
-  rec = list;
+  rec = list_ptr;
   while(1){
     printTable( rec );
     if( rec->next == NULL )
@@ -46,7 +50,7 @@ void printAll( struct Stack *list ){
   }
 }
 
-void insert(struct Stack **list_ptr, char *name, int type)
+void insert(char *name, int type)
 {
   struct Stack *new, *rec;
   static int address = 0; //仮のアドレス
@@ -60,29 +64,29 @@ void insert(struct Stack **list_ptr, char *name, int type)
   new->type = type;
   new->address = address;
 
-  if(*list_ptr == NULL){        //最初の要素の時
-    *list_ptr = new;
+  if(list_ptr == NULL){        //最初の要素の時
+    list_ptr = new;
   }
   else{                 //そうじゃないとき
-    rec = *list_ptr;
+    rec = list_ptr;
     while( rec->next != NULL ){
       rec = rec->next;
     }
     rec->next = new;
   }
   address++;  //先頭アドレスを更新
-  printAll(*list_ptr);
+  printAll();
 
 }
 
 //変数を検索して、すでに登録してあればその構造体のアドレスを返す
-struct Stack *lookup(struct Stack **list, char *name)
+struct Stack *lookup(char *name, int type)
 {
   struct Stack *rec;
 
-  rec = *list;
+  rec = list_ptr;
   while(1){
-    if(strcmp((rec->var),name) == 0)
+    if(strcmp((rec->var),name) == 0 && type == (rec->type))
       break;
     
     //一致しない場合の処理がまだ
@@ -92,30 +96,31 @@ struct Stack *lookup(struct Stack **list, char *name)
 }
 
 
-void delete(struct Stack **list_ptr, int type)
+void delete(int type)
 {
   struct Stack *tmp, *rec;
 
   //いきなり削除対象
-  if(((*list_ptr)->type) == LOC){
-    tmp = *list_ptr;
-    *list_ptr = (*list_ptr)->next;
+  if(((list_ptr)->type) == LOC){
+    tmp = list_ptr;
+    list_ptr = (list_ptr)->next;
     free(tmp);
   }
 
-  rec = (*(list_ptr))->next;
-    tmp = *list_ptr;
+  rec = ((list_ptr))->next;
+    tmp = list_ptr;
     while(rec != NULL){
       if(rec->type = LOC){
         //削除対象だった
         tmp->next = rec->next;
         free(rec);
       }
-    }
-    else{
+      else{
       //削除対象でない
       tmp = rec;
       rec = rec->next;
+      }
     }
-  printAll(*list_ptr);     
+    
+    printAll(list_ptr);     
 }
