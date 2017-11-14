@@ -110,10 +110,11 @@ void delete(int type)
   rec = ((list_ptr))->next;
     tmp = list_ptr;
     while(rec != NULL){
-      if(rec->type = LOC){
+      if(rec->type == LOC){
         //削除対象だった
         tmp->next = rec->next;
-        free(rec);
+        //free(rec);
+	return;
       }
       else{
       //削除対象でない
