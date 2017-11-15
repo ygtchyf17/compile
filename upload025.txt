@@ -1,0 +1,262 @@
+プログラミングおよび演習
+第10回演習 必須課題25　レポート
+
+081530375 川瀬卓也
+
+
+第10回演習の必須課題25について報告する．
+
+＜必須課題25＞
+
+ [概要]  上記の関数をテストする
+ [ソース] /pub1/ensyu/programming/students-2016/dm7014101/20160701/ex025.c
+ [解説]insertRecord関数でリストにレコードを追加、printAll関数で全てのレコード、printMonthlyRecords関数で指定された年月のレコードを印字、findRecord関数で指定された年月日のレコードの最初のポインタを返し、deleteRecord関数で指定されたレコード削除し、totalAmount関数で合計金額を返す、といった一連のプログラムを検査した。
+ [工夫]ループから抜け出すbreakやgotoを多用した。
+ [コンパイル方法] make -k ex025
+
+[実行結果]
+iced10.ice.nuie.nagoya-u.ac.jp{dm7014101}51: ex025
+レコードを入力(年/月/日 金額 用途): 2016/7/1 100000 （前月繰越）
+レコードを入力(年/月/日 金額 用途): 2016/7/10 -40000 （家賃）
+レコードを入力(年/月/日 金額 用途): 2016/8/15 -20000 （交通費）
+レコードを入力(年/月/日 金額 用途): 2016/9/5 70000 （バイト代）
+[2016/7/1]  +100000     （前月繰越）
+[2016/7/10]  -40000     （家賃）
+[2016/8/15]  -20000     （交通費）
+[2016/9/5]  +70000      （バイト代）
+合計額: 110000
+==================================================
+年月日で検索(yyyy/mm/dd): 2016/7/10
+===== 2016/7/10 のレコード =======================
+[2016/7/10]  -40000     （家賃）
+===== 2016年7月の家計簿 =======================
+[2016/7/1]  +100000     （前月繰越）
+[2016/7/10]  -40000     （家賃）
+削除する年月日(yyyy/mm/dd): 2016/7/30
+[2016/7/1]  +100000     （前月繰越）
+[2016/7/10]  -40000     （家賃）
+[2016/8/15]  -20000     （交通費）
+[2016/9/5]  +70000      （バイト代）
+削除する年月日(yyyy/mm/dd): 2016/8/15
+[2016/7/1]  +100000     （前月繰越）
+[2016/7/10]  -40000     （家賃）
+[2016/9/5]  +70000      （バイト代）
+削除する年月日(yyyy/mm/dd):  2016/7/1
+[2016/7/10]  -40000     （家賃）
+[2016/9/5]  +70000      （バイト代）
+削除する年月日(yyyy/mm/dd): 2016/9/5
+[2016/7/10]  -40000     （家賃）
+[END]
+
+以下はソースコード
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX 4
+
+struct AccountRecord{
+  int year;                    /* 年     */
+  int month;                   /* 月     */
+  int day;                     /* 日     */
+  int amount;                  /* 増減額 */
+  char comment[256];           /* 用  途 */
+  struct AccountRecord *next;  /* 次のレコードへのポインタ */
+};
+
+int insertRecord( struct AccountRecord **list_ptr, int y, int m, int d, int money, char *s ){
+
+  struct AccountRecord *new, *rec;
+  new = (struct AccountRecord *)malloc
+    (sizeof(struct AccountRecord));
+  new->next = NULL;
+
+  new->year = y;
+  new->month  = m;
+  new->day = d;
+  new->amount = money;
+  strcpy((new->comment), s);
+
+  if(*list_ptr == NULL){
+    *list_ptr = new;
+  }
+  else{
+    rec = *list_ptr;
+    while( rec->next != NULL ){
+      rec = rec->next;
+    }
+    rec->next = new;
+  }
+}
+
+
+void printRecord( struct AccountRecord *rec )
+{
+  /* recがNULLでなければ印字 */
+  if( rec != NULL ){
+    printf("[%d/%d/%d]  ",
+           rec->year, rec->month, rec->day );
+    /* 額が正の場合は + を印字 */
+    if( rec->amount > 0 ){
+      printf("+");
+    }
+    printf("%d \t%s\n", rec->amount, rec->comment );
+  }
+}
+
+
+void printAll( struct AccountRecord *list ){
+
+  struct AccountRecord *rec;
+
+  rec = list;
+  while(1){
+    printRecord( rec );
+    if( rec->next == NULL )
+      break;
+    rec = rec->next;
+  }
+}
+void printMonthlyRecords( struct AccountRecord *list, int y, int m ){
+
+  struct AccountRecord *rec;
+
+  rec = list;
+  while( rec->next != NULL ){
+    if((rec->year == y) && (rec->month == m))
+      printRecord( rec );
+    rec = rec->next;
+  }
+}
+
+struct AccountRecord *findRecord( struct AccountRecord *list, int y, int m, int d ){
+
+  struct AccountRecord *rec;
+
+  rec =list;
+  while(1){
+    if((rec->year == y) && (rec->month == m) && (rec->day == d))
+      goto FIN;
+
+    rec = rec->next;
+
+  }
+ FIN:
+  return rec;
+
+}
+
+int deleteRecord( struct AccountRecord **list_ptr, int y, int m, int d )
+{
+
+  struct AccountRecord *tmp, *rec;
+
+
+  if(((*list_ptr)->year == y) && ((*list_ptr)->month == m) && ((*list_ptr)->day == d)){
+    tmp = *list_ptr;
+    *list_ptr = (*list_ptr)->next;
+    free( tmp );
+    goto LAST;
+  }
+
+
+  rec = (*(list_ptr))->next;
+    tmp = *list_ptr;
+    while(rec != NULL){
+      if((rec->year == y) && (rec->month == m) && (rec->day == d)){
+        //削除対象だった
+        tmp->next =rec->next;
+        free( rec );
+        goto LAST;
+      }
+      else{
+        //削除対象でない
+        tmp = rec;
+        rec = rec->next;
+      }
+    }
+
+    return 0;
+ LAST:
+    return 1;
+}
+
+
+
+
+
+
+int totalAmount( struct AccountRecord *list ){
+
+  struct AccountRecord *rec;
+  int total = 0;
+
+  rec =list;
+  while(1){
+    total = total + rec->amount;
+    if( rec->next == NULL )
+      break;
+    rec = rec->next;
+  }
+  return total;
+}
+
+
+
+
+
+int main()
+{
+  struct AccountRecord *list = NULL; /* 線形リストへのポインタ */
+
+  int i;
+  int year, month, day, money;
+  char comment[256];
+
+  /* レコードを入力 */
+  for( i = 0 ; i < MAX ; i++ ){
+    printf("レコードを入力(年/月/日 金額 用途): ");
+    scanf("%d/%d/%d %d %s", &year, &month, &day, &money, comment );
+    getchar();
+    /* リストに挿入 */
+    if( insertRecord( &list, year, month, day, money, comment ) == 0 ){
+      fprintf(stderr,"Insert error!\n");
+      exit(1);
+    }
+  }
+
+  /* 全レコードを印字 */
+  printAll( list );
+
+  /* 総額を印字 */
+  printf("合計額: %d\n", totalAmount( list ) );
+  printf("==================================================\n");
+
+  /* レコードを検索 */
+  printf("年月日で検索(yyyy/mm/dd): ");
+  scanf("%d/%d/%d", &year, &month, &day );
+  getchar();
+
+  printf("===== %d/%d/%d のレコード =======================\n",
+         year, month, day );
+  printRecord( findRecord( list, year, month, day ) );
+
+ printf("===== %d年%d月の家計簿 =======================\n",
+         year, month );
+  printMonthlyRecords( list, year, month );
+
+  /* 指定したレコードを削除 */
+  for( i = 0 ; i < 4 ; i++ ){
+    printf("削除する年月日(yyyy/mm/dd): ");
+    scanf("%d/%d/%d", &year, &month, &day );
+    getchar();
+    deleteRecord( &list, year, month, day );
+    /* 全レコードを印字 */
+    printAll( list );
+  }
+
+  printf("[END]\n");
+
+  return 0;
+}
