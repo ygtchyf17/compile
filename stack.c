@@ -15,6 +15,8 @@ struct Stack
 };
 
 enum Type { GLOB, LOC, PLOC };
+
+complete ver.
 */
 void printTable(struct Stack *rec)
 {
@@ -78,6 +80,7 @@ void insert(char *name, int type)
   address++;  //先頭アドレスを更新
   printf("insert\n");
   printf("---------------------------------\n");
+
   printAll();
 
 }
@@ -90,14 +93,12 @@ struct Stack *lookup(char *name, int type)
   rec = list_ptr;
   while(1){
     if(strcmp((rec->var),name) == 0 && type == (rec->type))
-      return rec;
-    
-    if((rec->next) == NULL)
       break;
 
+    //一致しない場合の処理がまだ
     rec = rec->next;
   }
-  return NULL;
+  return rec;
 }
 
 
@@ -119,7 +120,7 @@ void delete(int type)
         //削除対象だった
         tmp->next = rec->next;
         //free(rec);
-	return;
+        return;
       }
       else{
       //削除対象でない
@@ -127,8 +128,8 @@ void delete(int type)
       rec = rec->next;
       }
     }
-    
+
     printf("delete\n");
     printf("---------------------------------\n");
-    printAll(list_ptr);     
+    printAll(list_ptr);
 }
