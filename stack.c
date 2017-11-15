@@ -95,7 +95,10 @@ struct Stack *lookup(char *name, int type)
     if(strcmp((rec->var),name) == 0 && type == (rec->type))
       break;
 
-    //一致しない場合の処理がまだ
+    //一致しない場合の処理がまだだった
+    if((rec->next)==NULL)
+      retun NULL;
+
     rec = rec->next;
   }
   return rec;
