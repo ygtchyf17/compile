@@ -137,7 +137,7 @@ proc_call_name
 block_statement
          : SBEGIN statement_list SEND
         {flag = GLOB;} /*大域変数に戻す*/
-	  {delete(LOC);} /*局所変数を削除*/
+          {delete(LOC);} /*局所変数を削除*/
         ;
 
 read_statement

@@ -48,6 +48,7 @@ void printAll(){
       break;
     rec = rec->next;
   }
+  printf("\n");
 }
 
 void insert(char *name, int type)
@@ -76,7 +77,7 @@ void insert(char *name, int type)
   }
   address++;  //先頭アドレスを更新
   printf("insert\n");
-  printf("---------------------------------");
+  printf("---------------------------------\n");
   printAll();
 
 }
@@ -128,6 +129,6 @@ void delete(int type)
     }
     
     printf("delete\n");
-    printf("---------------------------------");
+    printf("---------------------------------\n");
     printAll(list_ptr);     
 }
