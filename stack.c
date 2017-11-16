@@ -80,7 +80,7 @@ void insert(char *name, int type)
   address++;  //先頭アドレスを更新
   printf("insert\n");
   printf("---------------------------------\n");
-
+  
   printAll();
 
 }
@@ -94,11 +94,11 @@ struct Stack *lookup(char *name, int type)
   while(1){
     if(strcmp((rec->var),name) == 0 && type == (rec->type))
       break;
-
+    
     //一致しない場合の処理がまだだった
-    if((rec->next)==NULL)
-      retun NULL;
-
+    if((rec->next) == NULL)
+      return NULL;
+    
     rec = rec->next;
   }
   return rec;
@@ -123,7 +123,7 @@ void delete(int type)
         //削除対象だった
         tmp->next = rec->next;
         //free(rec);
-        return;
+	return;
       }
       else{
       //削除対象でない
@@ -134,5 +134,5 @@ void delete(int type)
 
     printf("delete\n");
     printf("---------------------------------\n");
-    printAll(list_ptr);
+    printAll(list_ptr);     
 }
