@@ -37,6 +37,10 @@ void printTable(struct Stack *rec)
         break;
       }
     }
+    /* else
+      {
+	printf("none\n");
+	} */
 }
 
 void printAll(){
@@ -86,22 +90,28 @@ void insert(char *name, int type)
 }
 
 //変数を検索して、すでに登録してあればその構造体のアドレスを返す
-struct Stack *lookup(char *name, int type)
+struct Stack  *lookup(char *name, int type)
 {
   struct Stack *rec;
 
   rec = list_ptr;
-  while(1){
-    if(strcmp((rec->var),name) == 0 && type == (rec->type))
+  while(rec != NULL){
+    if(strcmp((rec->var),name) == 0)
       break;
     
     //一致しない場合の処理がまだだった
-    if((rec->next) == NULL)
-      return NULL;
-    
+    /*if((rec->next) == NULL)
+      printf("none\n");
+    return NULL;
+    */
+
     rec = rec->next;
   }
-  return rec;
+  printf("lookup\n");
+  printf("---------------------------------\n");
+  printTable(rec);
+  printf("\n");
+  return NULL;
 }
 
 
