@@ -13,9 +13,7 @@ struct Stack
   int type;            //種類
   struct Stack *next;  //次のレコードへのポインタ
 };
-
 enum Type { GLOB, LOC, PLOC };
-
 complete ver.
 */
 void printTable(struct Stack *rec)
